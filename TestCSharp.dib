@@ -1,0 +1,9 @@
+#!csharp
+
+using System.IO;
+
+#!csharp
+
+// Path.Combine("/parent", "child")
+// Path.GetDirectoryName("/hey/ho/ha/hi")
+Path.GetFileName("/hey/ho/ha/hi")

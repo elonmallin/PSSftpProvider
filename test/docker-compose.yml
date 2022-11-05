@@ -1,0 +1,7 @@
+sftp:
+  image: atmoz/sftp
+  volumes:
+    - ./fixture:/home/foo/fixture
+  ports:
+    - "2222:22"
+  command: foo:pass:1001
