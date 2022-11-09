@@ -23,7 +23,7 @@ jobs:
     - uses: isbang/compose-action@v1.4.0
       with:
         compose-file: ./test/docker-compose/docker-compose.yml
-        up-flags: --abort-on-container-exit=sftp
+        up-flags: --exit-code-from sftp
         services: |
           sftp
     
