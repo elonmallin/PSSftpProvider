@@ -5,7 +5,7 @@ services:
       - ./fixture:/home/foo/fixture
     ports:
       - "2222:22"
-    command: foo:pass:::fixture
+    command: foo:pass:::upload
 
   test:
     build:
