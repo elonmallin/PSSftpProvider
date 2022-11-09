@@ -1,0 +1,15 @@
+services:
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - ./fixture:/home/foo/fixture
+    ports:
+      - "2222:22"
+    command: foo:pass:1001
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../../:/app

@@ -1,4 +1,5 @@
 ﻿using Renci.SshNet;
+using Renci.SshNet.Security;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -309,8 +310,12 @@ namespace PSSftpProvider
             var password = !string.IsNullOrEmpty(uri.UserInfo)
                 ? uri.UserInfo.Split(':')[1]
                 : drive.Credential.GetNetworkCredential().Password;
-
-            var client = new SftpClient(uri.Host, uri.Port, username, password);
+            
+            var connectionInfo = new ConnectionInfo(uri.Host, uri.Port, username, new List<AuthenticationMethod>
+            {
+                new PasswordAuthenticationMethod(username, password),
+            }.ToArray());
+            var client = new SftpClient(connectionInfo);
             client.Connect();
 
             drive.CurrentLocation = uri.LocalPath;

@@ -7,4 +7,4 @@ Import-Module "$publishPath/PSSftpProvider.dll"
 
 $cred = New-Object System.Management.Automation.PSCredential ("foo", ("pass" | ConvertTo-SecureString -AsPlainText -Force))
     
-New-PSDrive -PSProvider Sftp -Root sftp://localhost:2222/ -Name sftp -Credential $cred
+New-PSDrive -PSProvider Sftp -Root sftp://localhost:2222 -Name sftp -Credential $cred
