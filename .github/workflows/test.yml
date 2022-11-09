@@ -17,17 +17,13 @@ jobs:
     - name: Install and start sftp
       shell: bash
       run: |
-        echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
-        apk add --no-cache openssh openssl shadow@community
-        ssh-keygen -A
+        apt-get install -y openssh-server openssl
         useradd -ms /bin/bash -p "$(openssl passwd -1 pass)" foo
         chown root:root /home/foo
         chmod 755 /home/foo
         mkdir /home/foo/upload
         chmod 755 /home/foo/upload
-        rm -rf /etc/ssh/sshd_config
-        curl -sSL https://raw.githubusercontent.com/atmoz/sftp/master/files/sshd_config -o /etc/ssh/sshd_config
-        /usr/sbin/sshd -D -e
+        systemctl enable ssh --now
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
