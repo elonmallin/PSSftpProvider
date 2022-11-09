@@ -1,9 +1,12 @@
 #!csharp
 
 using System.IO;
+using System.Text.RegularExpressions;
 
 #!csharp
 
-// Path.Combine("/parent", "child")
+// Path.Combine("/ioko/", "/upload/rofl.txt")
 // Path.GetDirectoryName("/hey/ho/ha/hi")
-Path.GetFileName("/hey/ho/ha/hi")
+// Path.GetFileName("/hey/ho/ha/hi")
+// "hellowdok".Split("/")
+(new Regex("^[\\w-/\\.]+$")).IsMatch("awd_1/2.1")

@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Provider;
+using System.Linq;
 
 namespace PSSftpProvider
 {
@@ -14,6 +16,8 @@ namespace PSSftpProvider
     {
         private SftpDriveInfo DriveInfo => (SftpDriveInfo)PSDriveInfo;
         private SftpClient Client => DriveInfo.Client;
+        private const string PathSeparator = "/";
+        private const char PathSeparatorChar = '/';
 
         public void ClearContent(string path)
         {
@@ -172,13 +176,14 @@ namespace PSSftpProvider
 
         protected override string GetChildName(string path)
         {
-            var localPath = GetLocalPath(path);
+            if (!path.Contains(PathSeparator))
+            {
+                throw new ArgumentException($"{nameof(path)} must contain at least one {PathSeparator}");
+            }
 
-            var fileName = Path.GetFileName(localPath);
+            var parts = path.Split(PathSeparatorChar);
 
-            return string.IsNullOrWhiteSpace(fileName)
-                ? "/"
-                : fileName;
+            return parts[parts.Length-1];
         }
 
         protected override void GetChildNames(string path, ReturnContainers returnContainers)
@@ -218,13 +223,27 @@ namespace PSSftpProvider
 
         protected override string GetParentPath(string path, string root)
         {
-            return base.GetParentPath(path, root)
-                .ForwardSlash();
+            var lastSeparatorIndex = path.LastIndexOf(PathSeparatorChar);
+            var parentPath = path.Substring(0, lastSeparatorIndex);
+
+            return parentPath;
         }
 
         protected override bool HasChildItems(string path)
         {
-            return base.HasChildItems(path);
+            if (string.IsNullOrEmpty(path))
+            {
+                var items = Client.ListDirectory("/");
+                
+                return items.Count() > 0;
+            }
+            else
+            {
+                var localPath = GetLocalPath(path);
+                var items = Client.ListDirectory(localPath);
+                
+                return items.Count() > 0;
+            }
         }
 
         protected override Collection<PSDriveInfo> InitializeDefaultDrives()
@@ -252,14 +271,15 @@ namespace PSSftpProvider
 
         protected override bool IsValidPath(string path)
         {
-            var localPath = GetLocalPath(path);
-
-            return !string.IsNullOrWhiteSpace(localPath);
+            return !path.Contains("//")
+                && !path.Contains("\\")
+                && !string.IsNullOrWhiteSpace(path)
+                && (new Regex("^[\\w-/\\.]+$")).IsMatch(path);
         }
 
         protected override bool ItemExists(string path)
         {
-            var result = true;
+            var exists = false;
             var localPath = GetLocalPath(path);
 
             if (WildcardPattern.ContainsWildcardCharacters(localPath))
@@ -267,10 +287,10 @@ namespace PSSftpProvider
             }
             else
             {
-                // result = Client.Exists(localPath);
+                exists = Client.Exists(localPath);
             }
 
-            return result;
+            return exists;
         }
 
         protected override object ItemExistsDynamicParameters(string path)
@@ -280,12 +300,18 @@ namespace PSSftpProvider
 
         protected override string MakePath(string parent, string child)
         {
-            var localPath = Path.Combine(parent.ToLocal(), child)
-                .ToLocal();
+            if (string.IsNullOrEmpty(parent))
+            {
+                return child;
+            }
+            else if (string.IsNullOrEmpty(child))
+            {
+                return parent;
+            }
 
-            return string.IsNullOrWhiteSpace(localPath)
-                ? "/"
-                : localPath;
+            var path = $"{parent.TrimEnd(PathSeparatorChar)}{PathSeparator}{child.TrimStart(PathSeparatorChar)}";
+
+            return path;
         }
 
         protected override void MoveItem(string path, string destination)
@@ -454,9 +480,15 @@ namespace PSSftpProvider
 
         private string GetLocalPath(string path)
         {
-            return path
-                .Replace("\\", "/")
-                .Replace(DriveInfo.Root, DriveInfo.Client.WorkingDirectory);
+            if (path.StartsWith(DriveInfo.Root))
+            {
+                var withoutRoot = path.Replace(DriveInfo.Root, "");
+                var localPath = MakePath(DriveInfo.Client.WorkingDirectory, withoutRoot);
+
+                return localPath;
+            }
+            
+            return path;
         }
     }
 }

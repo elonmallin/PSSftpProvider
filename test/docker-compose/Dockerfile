@@ -56,6 +56,8 @@ RUN chmod +x /tmp/dotnet-install.sh \
 
 # COPY test/sshd-config /etc/ssh/sshd_config
 
+# wget -O /etc/ssh/sshd_config.d/atmoz.conf https://raw.githubusercontent.com/atmoz/sftp/master/files/sshd_config
+
 WORKDIR /app
 
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
