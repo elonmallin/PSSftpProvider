@@ -47,11 +47,16 @@ jobs:
       with:
         include_paths: test
         exclude_tags: skip_ci
-        report_name: module_tests
-        report_title: My Module Tests
+        report_name: TestResults
+        report_title: PSSftpProvider Test Results
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Sftp logs
+      shell: bash
+      run: |
+        sudo journalctl -t sshd
 
-    - name: dump test results
+    - name: Test results
       shell: pwsh
       run: |
         Write-Host 'Total Tests Executed...:  ${{ steps.test_module.outputs.total_count }}'
