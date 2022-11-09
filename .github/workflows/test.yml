@@ -17,13 +17,13 @@ jobs:
     - name: Install and start sftp
       shell: bash
       run: |
-        apt-get install -y openssh-server openssl
-        useradd -ms /bin/bash -p "$(openssl passwd -1 pass)" foo
-        chown root:root /home/foo
-        chmod 755 /home/foo
-        mkdir /home/foo/upload
-        chmod 755 /home/foo/upload
-        systemctl enable ssh --now
+        sudo apt-get install -y openssh-server openssl
+        sudo useradd -ms /bin/bash -p "$(openssl passwd -1 pass)" foo
+        sudo chown root:root /home/foo
+        sudo chmod 755 /home/foo
+        sudo mkdir /home/foo/upload
+        sudo chmod 755 /home/foo/upload
+        sudo systemctl enable ssh --now
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
