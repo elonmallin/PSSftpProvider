@@ -14,15 +14,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install and start sftp
+    - name: Create sftp user
       shell: bash
       run: |
-        sudo apt-get install -y openssh-server openssl
         sudo useradd -ms /bin/bash -p "$(openssl passwd -1 pass)" foo
         sudo chown root:root /home/foo
         sudo chmod 755 /home/foo
         sudo mkdir /home/foo/upload
         sudo chmod 755 /home/foo/upload
+        
+    - name: Start sftp
+      shell: bash
+      run: |
         sudo systemctl enable ssh --now
 
     - name: Setup .NET
@@ -35,7 +38,6 @@ jobs:
     - uses: isbang/compose-action@v1.4.0
       with:
         compose-file: ./test/docker-compose/docker-compose.yml
-        up-flags: --exit-code-from sftp
         services: |
           sftp
     
