@@ -9,5 +9,5 @@ Import-Module "$PSScriptRoot/../PSSftpProvider.psm1" -Force
 if (-not ((Get-PSDrive).Provider.Name -contains "Sftp")) {
     $cred = New-Object System.Management.Automation.PSCredential ("foo", ("pass" | ConvertTo-SecureString -AsPlainText -Force))
     
-    New-PSDrive -PSProvider Sftp -Root sftp://localhost:2222 -Name Sftp -Credential $cred
+    New-PSDrive -PSProvider Sftp -Root sftp://localhost:22 -Name Sftp -Credential $cred
 }
