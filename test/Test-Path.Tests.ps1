@@ -8,7 +8,7 @@ Describe 'Test-Path' {
         $item | Should -Be $false
     }
     It 'Given -Path to existing item, Then return true' {
-        $item = Test-Path -Path Sftp:/fixture
+        $item = Test-Path -Path Sftp:/upload
         $item | Should -Be $true
     }
 }
